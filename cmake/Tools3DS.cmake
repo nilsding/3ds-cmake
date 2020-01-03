@@ -254,6 +254,11 @@ function(__add_smdh target APP_TITLE APP_DESCRIPTION APP_AUTHOR APP_ICON)
 endfunction()
 
 function(add_3dsx_target target)
+    if(ROMFS_ROOT)
+        set(__ROMFS_PARAMS "--romfs=${CMAKE_CURRENT_LIST_DIR}/${ROMFS_ROOT}")
+    else()
+        set(__ROMFS_PARAMS "")
+    endif()
     get_filename_component(target_we ${target} NAME_WE)
     if((NOT (${ARGC} GREATER 1 AND "${ARGV1}" STREQUAL "NO_SMDH") ) OR (${ARGC} GREATER 3) )
         if(${ARGC} GREATER 3)
@@ -288,14 +293,14 @@ function(add_3dsx_target target)
             __add_smdh(${target_we}.smdh ${APP_TITLE} ${APP_DESCRIPTION} ${APP_AUTHOR} ${APP_ICON})
         endif()
         add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${target_we}.3dsx
-                            COMMAND ${_3DSXTOOL} $<TARGET_FILE:${target}> ${CMAKE_CURRENT_BINARY_DIR}/${target_we}.3dsx --smdh=${CMAKE_CURRENT_BINARY_DIR}/${target_we}.smdh
+                            COMMAND ${_3DSXTOOL} $<TARGET_FILE:${target}> ${CMAKE_CURRENT_BINARY_DIR}/${target_we}.3dsx --smdh=${CMAKE_CURRENT_BINARY_DIR}/${target_we}.smdh ${__ROMFS_PARAMS}
                             DEPENDS ${target} ${CMAKE_CURRENT_BINARY_DIR}/${target_we}.smdh
                             VERBATIM
         )
     else()
         message(STATUS "No smdh file will be generated")
         add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${target_we}.3dsx
-                            COMMAND ${_3DSXTOOL} $<TARGET_FILE:${target}> ${CMAKE_CURRENT_BINARY_DIR}/${target_we}.3dsx
+                            COMMAND ${_3DSXTOOL} $<TARGET_FILE:${target}> ${CMAKE_CURRENT_BINARY_DIR}/${target_we}.3dsx ${__ROMFS_PARAMS}
                             DEPENDS ${target}
                             VERBATIM
         )
